@@ -332,3 +332,19 @@ html.mobile-layout .seats-layer .seat.self-seat{display:flex}
  html.mobile-layout .turn-copy h2{font-size:12px}
  html.mobile-layout .timer-display strong{font-size:15px}
 }
+
+/* V5 contrast pass: lighter felt for better contrast with dark card faces */
+.table{
+  background:radial-gradient(circle at 50% 44%, #38ad71 0%, #239357 42%, #177344 72%, #0e5633 100%);
+}
+html.mobile-layout .table{
+  background:radial-gradient(ellipse at 50% 44%, #42ba7b 0%, #2c9f63 38%, #1f7d4c 70%, #145d39 100%);
+  border-color:#7fb083;
+  box-shadow:0 0 0 2px #cae2a8,0 7px 30px #0008,inset 0 0 30px rgba(255,255,255,.05),inset 0 0 34px #0004;
+}
+.table-rim{
+  border-color:rgba(224,246,205,.28);
+}
+html.mobile-layout .table-rim{
+  border-color:rgba(221,242,190,.45);
+}
