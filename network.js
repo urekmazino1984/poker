@@ -17,7 +17,7 @@ function setupConnection(c){connection=c;
  c.on('close',()=>{window.remoteConnected=false;status('Connection lost. Reload both pages to reconnect.');render();});
  c.on('error',err=>status('Connection error: '+err.message));
 }
-window.broadcastState=()=>{if(window.netRole==='host'&&connection?.open)connection.send({type:'state',state:snapshot()});};
+window.broadcastState=()=>{if(window.netRole==='host'&&connection?.open)connection.send({type:'state',state:snapshot(1)});};
 window.sendRemoteAction=(kind,amount)=>{if(window.netRole==='client'&&connection?.open)connection.send({type:'action',kind,amount});};
 function fail(err){status('Connection failed: '+(err?.message||err)+'. Try refreshing and using a new room.');}
 $('hostBtn').onclick=()=>{if(typeof Peer==='undefined'){status('PeerJS did not load. Check internet access.');return;}
