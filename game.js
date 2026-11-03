@@ -73,17 +73,107 @@ function tickClock(){if(window.netRole==='client'){if(!over&&turnDeadline)$('tur
  const kind=currentBet===p.bet?'call':'fold';act(kind);}
  else {const remaining=Math.max(0,Math.ceil((turnDeadline-Date.now())/1000));$('turnClock').textContent=remaining+'s';if(window.broadcastState)window.broadcastState();}}
 clockInterval=setInterval(tickClock,500);
-function render(){ensureClock();const seats=$('seats');seats.replaceChildren();for(const p of players){const el=document.createElement('div');el.className=`seat pos${p.id===localSeat()?0:2}${turn===p.id&&!over?' turn':''}${p.folded?' folded':''}${winners.includes(p.id)?' winner':''}`;
- const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent='P'+(p.id+1);el.append(avatar);
- const info=document.createElement('div');info.className='seat-info';const name=document.createElement('strong');name.textContent=p.name;if(p.id===dealer){const badge=document.createElement('span');badge.className='dealer';badge.textContent='D';name.append(badge);}const chips=document.createElement('span');chips.textContent=fmt(p.stack)+' chips';const note=document.createElement('small');note.textContent=p.folded?'FOLDED':p.allIn?'ALL-IN':p.bet?`Bet ${fmt(p.bet)}`:winners.includes(p.id)?'WINNER':' ';info.append(name,chips,note);el.append(info);
- const hole=document.createElement('div');hole.className='hole';if(p.id===localSeat())for(const c of p.hole)hole.append(card(c));else for(let i=0;i<(p.holeCount??p.hole.length);i++){const back=document.createElement('div');back.className='card card-back';back.textContent='♠';hole.append(back);}el.append(hole);seats.append(el);}
- $('community').replaceChildren();for(const c of board)$('community').append(card(c));for(let i=board.length;i<5;i++){const slot=document.createElement('div');slot.className='card placeholder';$('community').append(slot);}
- $('pot').textContent=fmt(pot);$('street').textContent=street.toUpperCase();$('handCount').textContent=`HAND #${hand} · LEVEL ${Math.floor((Math.max(1,hand)-1)/20)+1}`;$('blindValue').textContent=smallBlind+' / '+bigBlind;const mb=$('mobileBlindLabel');if(mb)mb.textContent='BLINDS '+smallBlind+'/'+bigBlind;$('message').textContent=lastMessage;
+function render(){ensureClock();
+ const seats=$('seats'),heroSeat=$('heroSeat'),heroCards=$('heroCards');
+ seats.replaceChildren();
+ if(heroSeat) heroSeat.replaceChildren();
+ if(heroCards) heroCards.replaceChildren();
+ for(const p of players){
+  const isSelf=p.id===localSeat();
+  const seat=document.createElement('div');
+  seat.className=`seat ${isSelf?'self-seat':'opp-seat'} pos${isSelf?0:2}${turn===p.id&&!over?' turn':''}${p.folded?' folded':''}${winners.includes(p.id)?' winner':''}`;
+
+  const avatar=document.createElement('div');
+  avatar.className='avatar';
+  avatar.textContent='P'+(p.id+1);
+  seat.append(avatar);
+
+  const info=document.createElement('div');
+  info.className='seat-info';
+  const name=document.createElement('strong');
+  name.textContent=p.name;
+  if(p.id===dealer){
+    const badge=document.createElement('span');
+    badge.className='dealer';
+    badge.textContent='D';
+    name.append(badge);
+  }
+  const chips=document.createElement('span');
+  chips.textContent=fmt(p.stack)+' chips';
+  const note=document.createElement('small');
+  note.textContent=p.folded?'FOLDED':p.allIn?'ALL-IN':p.bet?`Bet ${fmt(p.bet)}`:winners.includes(p.id)?'WINNER':' ';
+  info.append(name,chips,note);
+  seat.append(info);
+
+  const hole=document.createElement('div');
+  hole.className='hole';
+  if(isSelf){
+    for(const c of p.hole) hole.append(card(c));
+  }else{
+    for(let i=0;i<(p.holeCount??p.hole.length);i++){
+      const back=document.createElement('div');
+      back.className='card card-back';
+      back.textContent='♠';
+      hole.append(back);
+    }
+  }
+  seat.append(hole);
+  seats.append(seat);
+
+  if(isSelf && heroSeat && heroCards){
+    const hero=document.createElement('div');
+    hero.className='hero-player'+(turn===p.id&&!over?' turn':'')+(p.folded?' folded':'')+(winners.includes(p.id)?' winner':'');
+    const heroName=document.createElement('strong');
+    heroName.textContent=p.name;
+    if(p.id===dealer){
+      const badge=document.createElement('span');
+      badge.className='dealer';
+      badge.textContent='D';
+      heroName.append(badge);
+    }
+    const heroChips=document.createElement('span');
+    heroChips.textContent=fmt(p.stack)+' chips';
+    const heroNote=document.createElement('small');
+    heroNote.textContent=p.folded?'FOLDED':p.allIn?'ALL-IN':p.bet?`Bet ${fmt(p.bet)}`:winners.includes(p.id)?'WINNER':'Your hand';
+    hero.append(heroName,heroChips,heroNote);
+    heroSeat.append(hero);
+
+    for(const c of p.hole) heroCards.append(card(c));
+  }
+ }
+ $('community').replaceChildren();
+ for(const c of board) $('community').append(card(c));
+ for(let i=board.length;i<5;i++){
+  const slot=document.createElement('div');
+  slot.className='card placeholder';
+  $('community').append(slot);
+ }
+ $('pot').textContent=fmt(pot);
+ $('street').textContent=street.toUpperCase();
+ $('handCount').textContent=`HAND #${hand} · LEVEL ${Math.floor((Math.max(1,hand)-1)/20)+1}`;
+ $('blindValue').textContent=smallBlind+' / '+bigBlind;
+ const mb=$('mobileBlindLabel'); if(mb) mb.textContent='BLINDS '+smallBlind+'/'+bigBlind;
+ $('message').textContent=lastMessage;
  const p=players[turn],playing=!over&&!!p&&turn===(window.netRole==='host'?0:1)&&window.remoteConnected;
- $('turnClock').textContent=over?'—':turnDeadline?Math.max(0,Math.ceil((turnDeadline-Date.now())/1000))+'s':'50s';$('turnTitle').textContent=over?'Hand finished':!window.remoteConnected?'Waiting for second player…':playing?'Your turn':`${p?.name||'Player'} is playing`;$('fold').disabled=!playing;$('check').disabled=!playing;$('raise').disabled=!playing;$('allIn').disabled=!playing;$('raiseSlider').disabled=!playing;$('raiseInput').disabled=!playing;
- if(playing){const need=Math.max(0,currentBet-p.bet);$('check').textContent=need?`Call ${fmt(Math.min(need,p.stack))}`:'Check';const max=p.bet+p.stack,min=Math.min(max,currentBet+minRaise);$('raise').disabled=max<=currentBet;$('raise').textContent=max<=currentBet?'No raise':'Raise';$('raiseSlider').min=min;$('raiseSlider').max=max;$('raiseSlider').step=bigBlind;$('raiseInput').min=min;$('raiseInput').max=max;$('raiseInput').step=bigBlind;
- const old=Number($('raiseInput').value);const amount=Math.min(max,Math.max(min,Number.isFinite(old)?old:min));$('raiseSlider').value=amount;$('raiseInput').value=amount;$('raiseAmount').textContent=fmt(amount);$('raiseLabel').textContent=currentBet?'Raise to':'Bet';}
- $('next').hidden=!over||window.netRole!=='host';$('status').textContent=!window.remoteConnected?'Waiting for a second device':over?'Automatic next hand in 5 seconds':'Two human players · no bots';if(window.netRole==='host'&&window.remoteConnected&&window.broadcastState)window.broadcastState();}
+ $('turnClock').textContent=over?'—':turnDeadline?Math.max(0,Math.ceil((turnDeadline-Date.now())/1000))+'s':'50s';
+ $('turnTitle').textContent=over?'Hand finished':!window.remoteConnected?'Waiting for second player…':playing?'Your turn':`${p?.name||'Player'} is playing`;
+ $('fold').disabled=!playing; $('check').disabled=!playing; $('raise').disabled=!playing; $('allIn').disabled=!playing; $('raiseSlider').disabled=!playing; $('raiseInput').disabled=!playing;
+ if(playing){
+  const need=Math.max(0,currentBet-p.bet);
+  $('check').textContent=need?`Call ${fmt(Math.min(need,p.stack))}`:'Check';
+  const max=p.bet+p.stack,min=Math.min(max,currentBet+minRaise);
+  $('raise').disabled=max<=currentBet;
+  $('raise').textContent=max<=currentBet?'No raise':'Raise';
+  $('raiseSlider').min=min; $('raiseSlider').max=max; $('raiseSlider').step=bigBlind;
+  $('raiseInput').min=min; $('raiseInput').max=max; $('raiseInput').step=bigBlind;
+  const old=Number($('raiseInput').value);
+  const amount=Math.min(max,Math.max(min,Number.isFinite(old)?old:min));
+  $('raiseSlider').value=amount; $('raiseInput').value=amount; $('raiseAmount').textContent=fmt(amount); $('raiseLabel').textContent=currentBet?'Raise to':'Bet';
+ }
+ $('next').hidden=!over||window.netRole!=='host';
+ $('status').textContent=!window.remoteConnected?'Waiting for a second device':over?'Automatic next hand in 5 seconds':'Two human players · no bots';
+ if(window.netRole==='host'&&window.remoteConnected&&window.broadcastState) window.broadcastState();
+}
 function syncRaise(v){const min=Number($('raiseSlider').min),max=Number($('raiseSlider').max);let n=Math.max(min,Math.min(max,Number(v)||min));if(n!==max)n=Math.min(max,min+Math.round((n-min)/bigBlind)*bigBlind);$('raiseSlider').value=n;$('raiseInput').value=n;$('raiseAmount').textContent=fmt(n);}
 $('fold').addEventListener('click',()=>sendAction('fold'));$('check').addEventListener('click',()=>sendAction('call'));$('raise').addEventListener('click',()=>sendAction('raise'));$('raiseSlider').addEventListener('input',e=>syncRaise(e.target.value));$('raiseInput').addEventListener('input',e=>{$('raiseAmount').textContent=fmt(Number(e.target.value)||0);$('raiseSlider').value=e.target.value;});$('minus').addEventListener('click',()=>syncRaise(Number($('raiseInput').value)-bigBlind));$('plus').addEventListener('click',()=>syncRaise(Number($('raiseInput').value)+bigBlind));$('allIn').addEventListener('click',()=>syncRaise($('raiseSlider').max));$('next').addEventListener('click',()=>{if(window.netRole==='host')start();});$('reset').addEventListener('click',()=>{if(window.netRole!=='host')return;if(confirm('Reset all chip stacks and start over?')){players.forEach(p=>p.stack=5000);hand=0;dealer=1;start();}});
 function sendAction(kind){if(!window.remoteConnected||over||turn!==(window.netRole==='host'?0:1))return;

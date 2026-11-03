@@ -1,3 +1,14 @@
-FELT Poker mobile Classic UI v2
+FELT Poker — Classic Mobile V3
 
-Replace matching files in your GitHub Pages repository. This update hides the lobby after connection, removes the mobile header, uses a compact green oval table, enlarges the local player cards, and retains 50-second turns. Both host and client see themselves at the bottom.
+Changes in this build:
+- Keeps the existing top header
+- Rebuilds the mobile table layout to better match the chosen UI reference
+- Much smaller oval table on mobile
+- Larger hero cards for the local player under the table
+- Opponent seat attached above the table
+- Fixed bottom action area with Fold / Check / Raise + +/- + slider
+- Lobby is hidden after a connection is established
+- Uses the newly uploaded SVG playing-card set
+- 2-player PeerJS multiplayer preserved
+
+Upload all files in this folder to your GitHub repository, replacing files with the same names.
