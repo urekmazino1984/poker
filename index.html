@@ -38,8 +38,6 @@
       <div class="mobile-game-title">TEXAS HOLD’EM <span id="mobileBlindLabel"></span></div>
 
       <div class="table-shell">
-        <div id="seats" class="seats-layer"></div>
-
         <div class="table">
           <div class="table-rim">
             <div class="pot-title">TOTAL POT</div>
@@ -47,11 +45,16 @@
             <div class="community" id="community"></div>
             <div class="street" id="street">READY</div>
           </div>
+          <div id="seats" class="seats-layer"></div>
+          <div id="winnerBanner" class="winner-banner" hidden>
+            <span id="winnerHeadline">WINNER</span>
+            <strong id="winningHand">Winning hand</strong>
+            <span id="winnerDetails"></span>
+          </div>
         </div>
       </div>
 
       <div class="hero-zone">
-        <div id="heroSeat" class="hero-seat"></div>
         <div id="heroCards" class="hero-cards"></div>
       </div>
     </div>
@@ -95,6 +98,17 @@
         <span id="status">Every player is human. Take turns using the controls.</span>
         <button id="next" class="ghost" hidden>Next hand now ↗</button>
       </div>
+    </div>
+  </div>
+
+  <div id="readyOverlay" class="ready-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="readyTitle">
+    <div class="ready-overlay-panel">
+      <div class="ready-overline" id="readyHandNumber">HAND COMPLETE</div>
+      <h2 id="readyTitle">Hand complete</h2>
+      <p id="overlayResult">Result</p>
+      <div class="ready-count" id="readyCount">0 / 2 players ready</div>
+      <button id="readyButton" class="ready-button" type="button">Start next hand</button>
+      <div class="ready-status" id="readyStatus">Both players must confirm to continue.</div>
     </div>
   </div>
 
