@@ -5,7 +5,7 @@ let peer=null,connection=null,room=null;
 const status=msg=>{$('connectionStatus').textContent=msg;};
 function roomCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const bytes=new Uint8Array(6);crypto.getRandomValues(bytes);return [...bytes].map(b=>chars[b%chars.length]).join('');}
 function setupConnection(c){connection=c;
- c.on('open',()=>{window.remoteConnected=true;$('lobby').classList.add('connected');status(window.netRole==='host'?'Phone connected — game started!':'Connected to laptop — game started!');
+ c.on('open',()=>{window.remoteConnected=true;$('lobby').classList.add('connected');document.documentElement.classList.add('game-connected');status(window.netRole==='host'?'Phone connected — game started!':'Connected to laptop — game started!');
  if(window.netRole==='host')start();else c.send({type:'ready'});render();});
  c.on('data',msg=>{if(!msg||typeof msg!=='object')return;
  if(window.netRole==='host'&&msg.type==='action'&&turn===1&&!over){if(!['fold','call','raise'].includes(msg.kind))return;
@@ -14,7 +14,7 @@ function setupConnection(c){connection=c;
  if(window.netRole==='host'&&msg.type==='ready')window.broadcastState();
  if(window.netRole==='client'&&msg.type==='state')applySnapshot(msg.state);
  });
- c.on('close',()=>{window.remoteConnected=false;status('Connection lost. Reload both pages to reconnect.');render();});
+ c.on('close',()=>{window.remoteConnected=false;document.documentElement.classList.remove('game-connected');$('lobby').classList.remove('connected');status('Connection lost. Reload both pages to reconnect.');render();});
  c.on('error',err=>status('Connection error: '+err.message));
 }
 window.broadcastState=()=>{if(window.netRole==='host'&&connection?.open)connection.send({type:'state',state:snapshot(1)});};

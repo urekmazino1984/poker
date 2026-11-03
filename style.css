@@ -63,3 +63,43 @@ html.mobile-layout,html.mobile-layout body{width:100%;height:var(--screen-height
 .mobile-layout .lobby-buttons{display:flex;flex-direction:column}.mobile-layout .lobby-buttons>*{width:100%;max-width:none}
 @media(max-height:690px){.mobile-layout header{flex-basis:34px}.mobile-layout .heading{flex-basis:19px}.mobile-layout .controls{max-height:47%;padding:5px}.mobile-layout .primary-actions button{min-height:39px}.mobile-layout .seat.pos0 .hole .card{width:clamp(43px,13vw,60px)}.mobile-layout .seat.pos2 .hole .card{width:clamp(35px,10vw,49px)}.mobile-layout .raise-adjust .mini{min-height:28px}.mobile-layout .raise-box input[type=range]{height:17px}}
 @media(orientation:landscape) and (max-height:500px){.mobile-layout .app{padding-top:0;padding-bottom:0}.mobile-layout header{flex-basis:25px}.mobile-layout .heading{display:none}.mobile-layout .table-area{min-height:0}.mobile-layout .controls{max-height:58%}.mobile-layout .seat.pos0 .hole .card{width:38px}.mobile-layout .seat.pos2 .hole .card{width:30px}.mobile-layout .community .card{width:35px}.mobile-layout .control-top #message{display:none}}
+
+
+/* Mobile Classic redesign: the entire connected game fits inside the visual viewport. */
+.game-connected #lobby{display:none!important}
+.mobile-layout header,.mobile-layout .heading{display:none!important}
+.mobile-layout .app{background:radial-gradient(ellipse at 50% 38%,#073d24 0%,#041a12 68%,#020e0b 100%);padding:env(safe-area-inset-top) max(7px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(7px,env(safe-area-inset-left));gap:0}
+.mobile-layout .mobile-game-title{position:absolute;z-index:2;top:0;left:0;right:0;text-align:center;font-size:clamp(12px,3.8vw,16px);font-weight:900;letter-spacing:.3px;color:#e9f4e9;display:flex;justify-content:center;align-items:center;gap:12px;height:32px}
+.mobile-layout .mobile-game-title span{font-size:10px;font-weight:600;color:#91bfa2;letter-spacing:0}
+.mobile-layout .table-area{flex:1 1 auto;min-height:0;margin:0;overflow:visible}
+.mobile-layout .table{top:18%;bottom:26%;left:4%;right:4%;border:5px solid #174b2d;border-radius:47% / 48%;background:radial-gradient(ellipse,#086237 0%,#06482b 75%,#042e1d 100%);box-shadow:0 0 0 2px #53a567,0 0 14px #30a65b88,inset 0 0 32px #001c0f,0 14px 25px #0008}
+.mobile-layout .table-rim{inset:5px;border:1px solid #7edc9966;gap:clamp(3px,1vh,7px)}
+.mobile-layout .pot-title{font-size:11px;letter-spacing:0;color:#f5f7f3}.mobile-layout .pot{font-size:clamp(19px,5.5vw,26px)}
+.mobile-layout .community{gap:clamp(2px,.8vw,5px)}
+.mobile-layout .community .card{width:min(17.2vw,calc((var(--screen-height,700px) - 240px)*.145),76px);max-height:104px;aspect-ratio:.7}
+.mobile-layout .street{font-size:9px;color:#b8e1c0}
+.mobile-layout .seat{border:1.5px solid #52775e;background:#091b14;border-radius:11px;padding:5px 8px;gap:5px;box-shadow:0 5px 12px #000a;min-width:0}
+.mobile-layout .seat.pos2{top:6%;left:50%;transform:translateX(-50%);flex-direction:row}
+.mobile-layout .seat.pos0{bottom:0;left:50%;transform:translateX(-50%);border-color:#b5c967;background:#103520;flex-direction:column;gap:3px;min-width:135px}
+.mobile-layout .seat.pos0 .seat-info{text-align:center}.mobile-layout .seat.pos0 .seat-info strong{font-size:12px}.mobile-layout .seat.pos0 .seat-info small{display:none}
+.mobile-layout .seat.pos0 .hole .card{width:clamp(66px,19vw,94px);max-height:132px;aspect-ratio:.69}
+.mobile-layout .seat.pos2 .hole .card{width:clamp(30px,9vw,46px);max-height:66px}
+.mobile-layout .seat.pos2 .seat-info strong{font-size:11px}
+.mobile-layout .controls{flex:0 0 auto;max-height:41%;border:0;border-top:1px solid #345843;border-radius:0;background:#07150f;padding:5px 5px 4px;gap:3px;overflow:hidden}
+.mobile-layout .control-top{min-height:30px;gap:5px}
+.mobile-layout .control-top h2{font-size:clamp(12px,3.6vw,16px)}
+.mobile-layout .control-top #message{display:none}
+.mobile-layout .timer-display{font-size:9px}.mobile-layout .timer-display strong{font-size:17px}
+.mobile-layout .actionbar{display:flex;flex-direction:column;flex-wrap:nowrap;gap:5px;min-height:0;margin:0}
+.mobile-layout .primary-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;width:100%;flex:0 0 auto}
+.mobile-layout .primary-actions button{width:100%;min-width:0;min-height:clamp(47px,7.7vh,66px);border-radius:11px;font-size:clamp(15px,4.5vw,20px);font-weight:900;border:1px solid #ffffff33}
+.mobile-layout .raise-box{order:2;flex:1 1 auto;min-height:0;width:100%;padding:5px 9px;border-radius:9px;background:#10251a}
+.mobile-layout .raise-head{font-size:11px}.mobile-layout .raise-head strong{font-size:17px}
+.mobile-layout .raise-adjust{display:flex;align-items:center;gap:7px}
+.mobile-layout .raise-adjust .mini{min-width:42px;min-height:34px;font-size:18px}
+.mobile-layout .raise-adjust input{flex:1;min-width:0;width:0;max-height:34px}
+.mobile-layout .raise-box input[type=range]{width:100%;height:23px;margin:3px 0 0}
+.mobile-layout .footer{display:none}
+.mobile-layout .lobby{position:absolute;z-index:20;top:50%;left:50%;transform:translate(-50%,-50%);width:min(94vw,420px);max-height:85%;overflow:auto;display:block;background:#102a1c;box-shadow:0 0 0 100vmax #000b,0 20px 45px #000b}
+@media(max-height:680px){.mobile-layout .table{top:18%;bottom:28%}.mobile-layout .seat.pos0 .hole .card{width:clamp(52px,16vw,74px)}.mobile-layout .controls{max-height:46%}.mobile-layout .primary-actions button{min-height:42px}.mobile-layout .seat.pos2{top:8%}}
+@media(orientation:landscape) and (max-height:500px){.mobile-layout .mobile-game-title{height:18px;font-size:11px}.mobile-layout .table{top:18%;bottom:17%}.mobile-layout .seat.pos0{flex-direction:row;bottom:0}.mobile-layout .seat.pos0 .hole .card{width:36px}.mobile-layout .controls{max-height:65%}.mobile-layout .primary-actions button{min-height:34px}}
