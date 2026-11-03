@@ -1,12 +1,13 @@
-# FELT — two-device Texas Hold’em test
+# FELT Poker — responsive multiplayer update
 
-Upload the **contents** of this folder to the root of your GitHub `poker` repository. Enable GitHub Pages in **Settings → Pages → Deploy from a branch → main / (root)**. Open the resulting HTTPS URL on both devices.
+Upload **all files and the cards folder** to the root of your GitHub Pages `poker` repository. Existing files with matching paths will be replaced.
 
-1. On laptop click **Create table**, note the six-character code.
-2. On phone open the same URL, enter the code, click **Join table**.
-3. Laptop plays seat 1, phone plays seat 2. All hole cards are visible for testing.
-4. Both devices need internet to load PeerJS and reach its public signaling service.
+## Changes
+- Dedicated mobile layout below 700 CSS pixels, desktop layout at 700 and above.
+- Phone layout uses the visible viewport height, with no page scrolling; lobby appears as a modal.
+- Compact green poker table, larger hole cards, colorful large actions, betting controls below actions.
+- Host-authoritative 50-second action timer. Timeout checks when free, otherwise folds.
+- Two humans, private hole cards, starting stacks 5000, blinds 10/20 doubling every 20 hands.
 
-The laptop is authoritative: it deals, validates actions, and calculates winners. The phone sends only actions. No Firebase or database. If the laptop sleeps, the game stops. Refreshing resets the session.
-
-This is an early network test, not production-grade. The public PeerJS signaling service may be unavailable, and some hotspot configurations may need TURN relay support.
+## Testing
+Open the GitHub Pages URL on two devices, create a room on one and join on the other. On phone, test portrait and landscape; small phones may require further scaling refinement.

@@ -6,3 +6,60 @@
 .actionbar{display:flex;flex-direction:column;gap:10px}.primary-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.primary-actions button{min-height:68px;border:0;border-radius:13px;color:white;font-size:19px;font-weight:900;cursor:pointer}.primary-actions button:disabled,.raise-box button:disabled{opacity:.35;cursor:not-allowed}.raise-box{order:initial;flex:initial;width:100%;min-width:0}.raise-adjust{display:flex;align-items:center;gap:8px;margin-top:10px}.raise-adjust .mini{min-width:48px;min-height:44px;font-size:18px;font-weight:800}.raise-adjust input{flex:1;min-width:0;width:70px;text-align:center;font-size:18px}.raise-adjust #allIn{font-size:13px;min-width:76px}.raise-box input[type=range]{width:100%;height:22px;margin:12px 0 3px;touch-action:none}
 .card-back{display:grid;place-items:center;background:repeating-linear-gradient(45deg,#194e79 0 5px,#0b2d50 5px 10px);border:3px solid #e8e7df;color:white;font-size:22px}
 @media(max-width:600px){.app{padding:8px}.heading{margin:12px 0}.heading h1{font-size:24px}.heading p{display:none}.meta{display:none}.table-area{height:370px}.table{top:75px;bottom:80px;left:1%;right:1%;border-width:7px}.table-rim{inset:7px;gap:5px}.seat{padding:5px 7px;max-width:165px}.seat.pos0{bottom:0}.seat.pos2{top:0}.seat .avatar{display:none}.seat-info strong{font-size:12px}.seat-info span{font-size:11px}.hole .card{width:51px;height:74px}.community{gap:3px;min-height:85px}.community .card{width:clamp(45px,12.7vw,66px);height:clamp(65px,18vw,94px)}.pot-title{font-size:9px}.pot{font-size:25px}.controls{padding:12px}.actionbar{margin-top:10px}.primary-actions button{min-height:66px;font-size:17px}.control-top h2{font-size:18px}.lobby{margin:8px 0;padding:10px}.footer{margin-top:8px}}
+/* Dedicated compact phone screen, inspired by the Classic green mockup. */
+html.mobile-layout,html.mobile-layout body{width:100%;height:var(--screen-height,100dvh);overflow:hidden;overscroll-behavior:none}
+.mobile-layout .app{width:100%;height:var(--screen-height,100dvh);max-width:none;margin:0;padding:env(safe-area-inset-top) max(8px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:0;overflow:hidden;background:radial-gradient(ellipse at 50% 28%,#0a3023,#07120f 75%)}
+.mobile-layout header{flex:0 0 43px;padding:0 6px;border:0;justify-content:space-between}
+.mobile-layout header .logo{font-size:21px}.mobile-layout header .meta{display:block;font-size:9px;letter-spacing:.6px;margin-left:auto}.mobile-layout header #reset{display:none}
+.mobile-layout .heading{flex:0 0 23px;min-height:0;margin:0 3px 2px;align-items:center}
+.mobile-layout .heading .eyebrow,.mobile-layout .heading h1,.mobile-layout .heading p,.mobile-layout .blinds small{display:none}
+.mobile-layout .blinds{display:flex;flex-direction:row;gap:7px;align-items:center;font-size:10px;letter-spacing:1px}
+.mobile-layout .blinds b{font-size:14px}
+.mobile-layout .heading:before{content:'TEXAS HOLD’EM';font-size:10px;font-weight:900;letter-spacing:1.3px;color:#c2d6c6}
+.mobile-layout .table-area{flex:1 1 auto;min-height:0;height:auto;margin:0;position:relative}
+.mobile-layout .table{left:1%;right:1%;top:15%;bottom:24%;border:5px solid #37614c;border-radius:46% / 43%;box-shadow:0 0 0 2px #7b9d69,0 8px 20px #0009,inset 0 0 45px #061e12;background:radial-gradient(ellipse,#14643a 0%,#0c432a 70%,#092b1c 100%)}
+.mobile-layout .table-rim{inset:5px;border:1px solid #83bb8555;border-radius:46% / 43%;gap:clamp(3px,1vh,9px)}
+.mobile-layout .pot-title{font-size:9px;letter-spacing:1px}.mobile-layout .pot{font-size:clamp(18px,5vw,27px)}
+.mobile-layout .community{gap:clamp(2px,.8vw,5px);min-height:0;width:100%;justify-content:center}
+.mobile-layout .community .card{width:min(17.3vw,calc((var(--screen-height,700px) - 260px)*.13),72px);height:auto;aspect-ratio:0.7;max-height:104px;object-fit:fill;border-radius:4px}
+.mobile-layout .street{font-size:10px;letter-spacing:1px}
+.mobile-layout .seat{max-width:none;min-width:0;display:flex;flex-wrap:nowrap;gap:8px;padding:5px 9px;border:1px solid #75947b;border-radius:11px;background:#0e211a;box-shadow:0 4px 12px #0009}
+.mobile-layout .seat .avatar{display:none}.mobile-layout .seat-info{min-width:76px}
+.mobile-layout .seat-info strong{font-size:12px}.mobile-layout .seat-info span{font-size:11px}.mobile-layout .seat-info small{font-size:9px}
+.mobile-layout .seat.pos2{top:1%;left:50%;right:auto;transform:translateX(-50%)}
+.mobile-layout .seat.pos0{bottom:0;left:50%;right:auto;transform:translateX(-50%);background:#17372a;border-color:#c5b272}
+.mobile-layout .hole{margin-left:0;gap:5px}
+.mobile-layout .hole .card{width:clamp(39px,12vw,65px);height:auto;aspect-ratio:.69;max-height:93px;object-fit:fill}
+.mobile-layout .seat.pos0 .hole .card{width:clamp(52px,16vw,78px);max-height:112px}
+.mobile-layout .card-back{font-size:18px}
+.mobile-layout .controls{flex:0 0 auto;min-height:0;max-height:44%;padding:7px 8px 8px;background:#0d1b17;border:1px solid #42694d;border-radius:13px;display:flex;flex-direction:column;gap:4px;overflow:hidden}
+.mobile-layout .control-top{flex:0 0 auto;align-items:center;gap:5px}
+.mobile-layout .control-top>div:first-child{display:flex;align-items:center;gap:7px;min-width:0;flex-wrap:wrap}
+.mobile-layout .control-top .eyebrow{display:none}
+.mobile-layout .control-top h2{font-size:clamp(13px,3.7vw,18px);margin:0;white-space:nowrap}
+.mobile-layout .timer-display{font-size:9px;white-space:nowrap}
+.mobile-layout .timer-display strong{font-size:19px;margin-left:3px}
+.mobile-layout .control-top #message{font-size:10px;line-height:1.15;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;order:3;flex-basis:100%;margin:0}
+.mobile-layout .hand-count{font-size:10px;white-space:nowrap;align-self:flex-start}
+.mobile-layout .actionbar{margin:0;gap:5px;flex:1 1 auto;min-height:0}
+.mobile-layout .primary-actions{gap:6px;flex:0 0 auto}
+.mobile-layout .primary-actions button{min-height:clamp(43px,7.2vh,64px);font-size:clamp(14px,4.3vw,19px);border-radius:10px;box-shadow:inset 0 1px 0 #ffffff33,0 3px 6px #0005}
+.mobile-layout .fold{background:linear-gradient(#ce3f40,#9c2429)}.mobile-layout .call{background:linear-gradient(#1c83bd,#15517f)}.mobile-layout .raise{background:linear-gradient(#2cac5a,#167a37)}
+.mobile-layout .raise-box{padding:5px 8px;min-height:0;background:#142820;border-radius:9px}
+.mobile-layout .raise-head{font-size:11px}.mobile-layout .raise-head strong{font-size:16px}
+.mobile-layout .raise-adjust{margin-top:3px;gap:6px}
+.mobile-layout .raise-adjust .mini{min-height:32px;min-width:37px;font-size:17px;padding:3px 6px}
+.mobile-layout .raise-adjust #allIn{min-width:62px;font-size:11px}
+.mobile-layout .raise-adjust input{font-size:15px;padding:4px;max-height:33px}
+.mobile-layout .raise-box input[type=range]{height:22px;margin:3px 0 0;accent-color:#e4b768}
+.mobile-layout .footer{margin:0;flex:0 0 13px;min-height:0;font-size:9px;overflow:hidden}
+.mobile-layout .footer #status{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.mobile-layout .footer #next{padding:3px 7px;font-size:10px}
+/* Lobby is a compact modal, not a block that pushes the table off-screen. */
+.mobile-layout .lobby{position:absolute;z-index:10;top:50%;left:50%;transform:translate(-50%,-50%);width:min(94vw,410px);max-height:78%;overflow:auto;margin:0;padding:18px;background:#142d24;box-shadow:0 0 0 100vmax #000a,0 15px 45px #000b;border:1px solid #7aa889}
+.mobile-layout .lobby.connected{position:static;transform:none;box-shadow:none;width:auto;max-height:none;flex:0 0 auto;padding:3px 8px;border-radius:7px;display:flex;align-items:center;gap:8px;background:#10291d}
+.mobile-layout .lobby.connected .lobby-title,.mobile-layout .lobby.connected #connectionStatus{display:none}
+.mobile-layout .lobby.connected #roomDisplay{margin:0;font-size:11px;letter-spacing:1px}
+.mobile-layout .lobby-buttons{display:flex;flex-direction:column}.mobile-layout .lobby-buttons>*{width:100%;max-width:none}
+@media(max-height:690px){.mobile-layout header{flex-basis:34px}.mobile-layout .heading{flex-basis:19px}.mobile-layout .controls{max-height:47%;padding:5px}.mobile-layout .primary-actions button{min-height:39px}.mobile-layout .seat.pos0 .hole .card{width:clamp(43px,13vw,60px)}.mobile-layout .seat.pos2 .hole .card{width:clamp(35px,10vw,49px)}.mobile-layout .raise-adjust .mini{min-height:28px}.mobile-layout .raise-box input[type=range]{height:17px}}
+@media(orientation:landscape) and (max-height:500px){.mobile-layout .app{padding-top:0;padding-bottom:0}.mobile-layout header{flex-basis:25px}.mobile-layout .heading{display:none}.mobile-layout .table-area{min-height:0}.mobile-layout .controls{max-height:58%}.mobile-layout .seat.pos0 .hole .card{width:38px}.mobile-layout .seat.pos2 .hole .card{width:30px}.mobile-layout .community .card{width:35px}.mobile-layout .control-top #message{display:none}}

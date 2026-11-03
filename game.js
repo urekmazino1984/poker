@@ -2,7 +2,7 @@
 // Four human seats, shared-screen test mode. No bots, networking, or external dependencies.
 const $=id=>document.getElementById(id), R='23456789TJQKA', S='CDHS';
 const players=['Laptop','Phone'].map((name,id)=>({id,name,stack:5000,hole:[],folded:false,allIn:false,bet:0,total:0,acted:false}));
-const STARTING_CHIPS=5000, BASE_SB=10, BASE_BB=20, HANDS_PER_LEVEL=20, ACTION_SECONDS=20;
+const STARTING_CHIPS=5000, BASE_SB=10, BASE_BB=20, HANDS_PER_LEVEL=20, ACTION_SECONDS=50;
 let smallBlind=BASE_SB,bigBlind=BASE_BB,turnDeadline=0,clockKey='',clockInterval=null;
 let deck=[],board=[],dealer=1,turn=-1,street='idle',currentBet=0,minRaise=20,pot=0,hand=0,over=true,timer=null,lastMessage='',winners=[];
 function random(n){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n;}
@@ -16,7 +16,7 @@ const contenders=()=>players.filter(p=>p.hole.length&&!p.folded);
 const fmt=n=>n.toLocaleString('en-US');
 function say(s){lastMessage=s;}
 function pay(p,n){let x=Math.min(p.stack,Math.max(0,Math.floor(n)));p.stack-=x;p.bet+=x;p.total+=x;pot+=x;if(!p.stack)p.allIn=true;return x;}
-function start(){if(window.netRole!=='host'||!window.remoteConnected)return;clearTimeout(timer);if(players.filter(active).length<2){players.forEach(p=>p.stack=5000);say('New tournament: stacks reset to 2,000.');}
+function start(){if(window.netRole!=='host'||!window.remoteConnected)return;clearTimeout(timer);if(players.filter(active).length<2){players.forEach(p=>p.stack=5000);say('New tournament: stacks reset to 5,000.');}
  hand++;const level=Math.floor((hand-1)/HANDS_PER_LEVEL);smallBlind=BASE_SB*Math.pow(2,level);bigBlind=BASE_BB*Math.pow(2,level);deck=shuffle();board=[];pot=0;currentBet=0;minRaise=bigBlind;street='preflop';over=false;winners=[];
  players.forEach(p=>{p.hole=[];p.folded=!p.stack;p.allIn=false;p.bet=0;p.total=0;p.acted=false;});
  dealer=next(dealer,active);const seats=players.filter(active);for(let i=0;i<2;i++)for(const p of seats)p.hole.push(deck.pop());
@@ -68,7 +68,7 @@ function ensureClock(){if(window.netRole!=='host'||over||!window.remoteConnected
  const key=hand+'-'+street+'-'+turn+'-'+players[turn].total+'-'+players[turn].acted+'-'+currentBet;
  if(key!==clockKey){clockKey=key;turnDeadline=Date.now()+ACTION_SECONDS*1000;}
 }
-function tickClock(){if(window.netRole!=='host'||over||!window.remoteConnected||turn<0)return;
+function tickClock(){if(window.netRole==='client'){if(!over&&turnDeadline)$('turnClock').textContent=Math.max(0,Math.ceil((turnDeadline-Date.now())/1000))+'s';return;}if(window.netRole!=='host'||over||!window.remoteConnected||turn<0)return;
  ensureClock();if(Date.now()>=turnDeadline){const p=players[turn];if(!canAct(p))return;
  const kind=currentBet===p.bet?'call':'fold';act(kind);}
  else {const remaining=Math.max(0,Math.ceil((turnDeadline-Date.now())/1000));$('turnClock').textContent=remaining+'s';if(window.broadcastState)window.broadcastState();}}
@@ -80,7 +80,7 @@ function render(){ensureClock();const seats=$('seats');seats.replaceChildren();f
  $('community').replaceChildren();for(const c of board)$('community').append(card(c));for(let i=board.length;i<5;i++){const slot=document.createElement('div');slot.className='card placeholder';$('community').append(slot);}
  $('pot').textContent=fmt(pot);$('street').textContent=street.toUpperCase();$('handCount').textContent=`HAND #${hand} · LEVEL ${Math.floor((Math.max(1,hand)-1)/20)+1}`;$('blindValue').textContent=smallBlind+' / '+bigBlind;$('message').textContent=lastMessage;
  const p=players[turn],playing=!over&&!!p&&turn===(window.netRole==='host'?0:1)&&window.remoteConnected;
- $('turnClock').textContent=over?'—':turnDeadline?Math.max(0,Math.ceil((turnDeadline-Date.now())/1000))+'s':'20s';$('turnTitle').textContent=over?'Hand finished':!window.remoteConnected?'Waiting for second player…':playing?'Your turn':`${p?.name||'Player'} is playing`;$('fold').disabled=!playing;$('check').disabled=!playing;$('raise').disabled=!playing;$('allIn').disabled=!playing;$('raiseSlider').disabled=!playing;$('raiseInput').disabled=!playing;
+ $('turnClock').textContent=over?'—':turnDeadline?Math.max(0,Math.ceil((turnDeadline-Date.now())/1000))+'s':'50s';$('turnTitle').textContent=over?'Hand finished':!window.remoteConnected?'Waiting for second player…':playing?'Your turn':`${p?.name||'Player'} is playing`;$('fold').disabled=!playing;$('check').disabled=!playing;$('raise').disabled=!playing;$('allIn').disabled=!playing;$('raiseSlider').disabled=!playing;$('raiseInput').disabled=!playing;
  if(playing){const need=Math.max(0,currentBet-p.bet);$('check').textContent=need?`Call ${fmt(Math.min(need,p.stack))}`:'Check';const max=p.bet+p.stack,min=Math.min(max,currentBet+minRaise);$('raise').disabled=max<=currentBet;$('raise').textContent=max<=currentBet?'No raise':'Raise';$('raiseSlider').min=min;$('raiseSlider').max=max;$('raiseSlider').step=bigBlind;$('raiseInput').min=min;$('raiseInput').max=max;$('raiseInput').step=bigBlind;
  const old=Number($('raiseInput').value);const amount=Math.min(max,Math.max(min,Number.isFinite(old)?old:min));$('raiseSlider').value=amount;$('raiseInput').value=amount;$('raiseAmount').textContent=fmt(amount);$('raiseLabel').textContent=currentBet?'Raise to':'Bet';}
  $('next').hidden=!over||window.netRole!=='host';$('status').textContent=!window.remoteConnected?'Waiting for a second device':over?'Automatic next hand in 5 seconds':'Two human players · no bots';if(window.netRole==='host'&&window.remoteConnected&&window.broadcastState)window.broadcastState();}
