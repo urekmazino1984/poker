@@ -11,7 +11,7 @@ function setupConnection(c){connection=c;
  if(window.netRole==='host'&&msg.type==='action'&&turn===1&&!over){if(!['fold','call','raise'].includes(msg.kind))return;
  if(msg.kind==='raise')$('raiseInput').value=Number.isFinite(msg.amount)?msg.amount:0;
  act(msg.kind);}
- if(window.netRole==='host'&&msg.type==='ready-next')markReady(1,Number(msg.hand));
+ if(window.netRole==='host'&&msg.type==='new-game'&&tournamentOver)startNewGame();
  if(window.netRole==='host'&&msg.type==='ready')window.broadcastState();
  if(window.netRole==='client'&&msg.type==='state')applySnapshot(msg.state);
  });
@@ -20,7 +20,7 @@ function setupConnection(c){connection=c;
 }
 window.broadcastState=()=>{if(window.netRole==='host'&&connection?.open)connection.send({type:'state',state:snapshot(1)});};
 window.sendRemoteAction=(kind,amount)=>{if(window.netRole==='client'&&connection?.open)connection.send({type:'action',kind,amount});};
-window.sendReadyNext=forHand=>{if(window.netRole==='client'&&connection?.open)connection.send({type:'ready-next',hand:forHand});};
+window.sendNewGame=()=>{if(window.netRole==='client'&&connection?.open)connection.send({type:'new-game'});};
 function fail(err){status('Connection failed: '+(err?.message||err)+'. Try refreshing and using a new room.');}
 $('hostBtn').onclick=()=>{if(typeof Peer==='undefined'){status('PeerJS did not load. Check internet access.');return;}
  window.netRole='host';room=roomCode();$('roomDisplay').textContent='ROOM: '+room;

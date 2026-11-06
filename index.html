@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>FELT — Multiplayer Hold'em</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
   <div class="app">
@@ -101,20 +101,19 @@
     </div>
   </div>
 
-  <div id="readyOverlay" class="ready-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="readyTitle">
-    <div class="ready-overlay-panel">
-      <div class="ready-overline" id="readyHandNumber">HAND COMPLETE</div>
-      <h2 id="readyTitle">Hand complete</h2>
-      <p id="overlayResult">Result</p>
-      <div class="ready-count" id="readyCount">0 / 2 players ready</div>
-      <button id="readyButton" class="ready-button" type="button">Start next hand</button>
-      <div class="ready-status" id="readyStatus">Both players must confirm to continue.</div>
-    </div>
-  </div>
+  <section id="handResultPanel" class="hand-result-panel" hidden role="status" aria-live="polite">
+    <div class="result-panel-title" id="resultTitle">Hand complete</div>
+    <div class="result-panel-rank" id="resultHeadline"></div>
+    <div class="result-panel-subtitle" id="resultSubhead"></div>
+    <div class="hand-results" id="handResults"></div>
+    <div class="result-countdown" id="resultCountdown"></div>
+    <button id="newGameButton" class="new-game-button" hidden>Start new game</button>
+  </section>
+  <div class="bottom-buffer" aria-hidden="true"></div>
 
   <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-  <script src="layout.js"></script>
-  <script src="game.js"></script>
-  <script src="network.js"></script>
+  <script src="layout.js?v=6"></script>
+  <script src="game.js?v=6"></script>
+  <script src="network.js?v=6"></script>
 </body>
 </html>

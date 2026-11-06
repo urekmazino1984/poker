@@ -5,7 +5,7 @@ const players=['Laptop','Phone'].map((name,id)=>({id,name,stack:5000,hole:[],fol
 const STARTING_CHIPS=5000, BASE_SB=10, BASE_BB=20, HANDS_PER_LEVEL=20, ACTION_SECONDS=50;
 let smallBlind=BASE_SB,bigBlind=BASE_BB,turnDeadline=0,clockKey='',clockInterval=null;
 let deck=[],board=[],dealer=1,turn=-1,street='idle',currentBet=0,minRaise=20,pot=0,hand=0,over=true,timer=null,lastMessage='',winners=[];
-let readySeats=[false,false],winningHandLabel='',winningDetails='';
+let winningHandLabel='',winningDetails='',showdownRevealed=false,handResults=[],handEndDeadline=0,tournamentOver=false,championId=-1;
 function random(n){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n;}
 function shuffle(){const d=[...R].flatMap(rank=>[...S].map(suit=>({rank,suit})));for(let i=d.length-1;i>0;i--){const j=random(i+1);[d[i],d[j]]=[d[j],d[i]];}return d;}
 function cardName(c){return c.rank+c.suit+'.svg';}
@@ -17,15 +17,15 @@ const contenders=()=>players.filter(p=>p.hole.length&&!p.folded);
 const fmt=n=>n.toLocaleString('en-US');
 function say(s){lastMessage=s;}
 function pay(p,n){let x=Math.min(p.stack,Math.max(0,Math.floor(n)));p.stack-=x;p.bet+=x;p.total+=x;pot+=x;if(!p.stack)p.allIn=true;return x;}
-function start(){if(window.netRole!=='host'||!window.remoteConnected)return;clearTimeout(timer);if(players.filter(active).length<2){players.forEach(p=>p.stack=5000);say('New tournament: stacks reset to 5,000.');}
- readySeats=players.map(()=>false);winningHandLabel='';winningDetails='';
+function start(){if(window.netRole!=='host'||!window.remoteConnected||tournamentOver)return;clearTimeout(timer);if(players.filter(active).length<2)return;
+ showdownRevealed=false;handResults=[];handEndDeadline=0;winningHandLabel='';winningDetails='';
  hand++;const level=Math.floor((hand-1)/HANDS_PER_LEVEL);smallBlind=BASE_SB*Math.pow(2,level);bigBlind=BASE_BB*Math.pow(2,level);deck=shuffle();board=[];pot=0;currentBet=0;minRaise=bigBlind;street='preflop';over=false;winners=[];
  players.forEach(p=>{p.hole=[];p.folded=!p.stack;p.allIn=false;p.bet=0;p.total=0;p.acted=false;});
  dealer=next(dealer,active);const seats=players.filter(active);for(let i=0;i<2;i++)for(const p of seats)p.hole.push(deck.pop());
  const sb=seats.length===2?dealer:next(dealer,active),bb=next(sb,active);pay(players[sb],smallBlind);pay(players[bb],bigBlind);currentBet=players[bb].bet;
  turn=bb;clockKey='';say(`Hand #${hand} · ${players[sb].name} posts small blind, ${players[bb].name} posts big blind.`);render();settle();}
 function roundDone(){return players.filter(canAct).every(p=>p.acted&&p.bet===currentBet);}
-function settle(){if(over)return;if(contenders().length===1){const p=contenders()[0];p.stack+=pot;winners=[p.id];end(`${p.name} wins ${fmt(pot)} chips (everyone else folded).`, 'Won by fold', `${p.name} · ${fmt(pot)} chips`);return;}
+function settle(){if(over)return;if(contenders().length===1){const p=contenders()[0];p.stack+=pot;winners=[p.id];handResults=players.filter(q=>q.hole.length).map(q=>({id:q.id,name:q.name,label:q.id===p.id?'Won by fold':'Folded',cards:[],won:q.id===p.id?pot:0,winner:q.id===p.id})).sort((a,b)=>Number(b.winner)-Number(a.winner));end(`${p.name} wins ${fmt(pot)} chips (everyone else folded).`, 'Won by fold', `${p.name} · ${fmt(pot)} chips`);return;}
  if(roundDone()||players.filter(canAct).length===0){advanceStreet();return;}
  turn=next(turn,canAct);clockKey='';render();}
 function advanceStreet(){if(over)return;
@@ -64,29 +64,41 @@ function showdown(){street='showdown';const scores=new Map(contenders().map(p=>[
  for(const p of tied){const win=share+(extra-->0?1:0);p.stack+=win;earned.set(p.id,(earned.get(p.id)||0)+win);}
  }
  winners=[...earned.keys()];const summary=[...earned].map(([id,amount])=>`${players[id].name} wins ${fmt(amount)} (${labels[scores.get(id)[0]]})`).join(' · ');
+ showdownRevealed=true;handResults=players.filter(p=>p.hole.length).map(p=>({id:p.id,name:p.name,label:p.folded?'Folded':labels[scores.get(p.id)[0]],cards:p.folded?[]:p.hole.map(c=>({...c})),won:earned.get(p.id)||0,winner:winners.includes(p.id)})).sort((a,b)=>Number(b.winner)-Number(a.winner)||b.won-a.won);
  const winnerNames=winners.map(id=>players[id].name).join(' & ');
  const rankNames=[...new Set(winners.map(id=>labels[scores.get(id)[0]]))].join(' / ');
  end(summary||'Hand completed.',rankNames||'Split pot',`${winnerNames} · ${fmt([...earned.values()].reduce((a,b)=>a+b,0))} chips`);}
-function end(s,rank='',details=''){over=true;turn=-1;turnDeadline=0;clockKey='';street='showdown';
- winningHandLabel=rank;winningDetails=details;say(s);readySeats=players.map(()=>false);render();}
-function markReady(seatId,forHand){
- if(window.netRole!=='host'||!window.remoteConnected||!over||hand<1||forHand!==hand||!players[seatId]||readySeats[seatId])return;
- readySeats[seatId]=true;render();
- if(readySeats.every(Boolean))start();
+function end(s,rank='',details=''){
+ over=true;turn=-1;turnDeadline=0;clockKey='';street='showdown';
+ winningHandLabel=rank;winningDetails=details;say(s);
+ const survivors=players.filter(p=>p.stack>0);
+ tournamentOver=survivors.length===1;
+ championId=tournamentOver?survivors[0].id:-1;
+ handEndDeadline=tournamentOver?0:Date.now()+5000;
+ render();
+ if(!tournamentOver){
+   clearTimeout(timer);
+   timer=setTimeout(()=>{if(window.netRole==='host'&&window.remoteConnected&&!tournamentOver)start();},5000);
+ }
 }
-function requestNextHand(){
- if(!window.remoteConnected||!over||hand<1)return;
- const id=localSeat();
- if(readySeats[id]||window.localReadyPendingHand===hand)return;
- if(window.netRole==='host')markReady(id,hand);
- else if(window.sendReadyNext){window.localReadyPendingHand=hand;window.sendReadyNext(hand);render();}
+function startNewGame(){
+ if(window.netRole!=='host'||!window.remoteConnected||!tournamentOver)return;
+ clearTimeout(timer);
+ players.forEach(p=>{p.stack=STARTING_CHIPS;p.hole=[];p.folded=false;p.allIn=false;p.bet=0;p.total=0;p.acted=false;});
+ hand=0;dealer=1;tournamentOver=false;championId=-1;showdownRevealed=false;handResults=[];handEndDeadline=0;
+ start();
+}
+function requestNewGame(){
+ if(!tournamentOver||!window.remoteConnected)return;
+ if(window.netRole==='host')startNewGame();
+ else if(window.sendNewGame)window.sendNewGame();
 }
 function localSeat(){return window.netRole==='client'?1:0;}
 function ensureClock(){if(window.netRole!=='host'||over||!window.remoteConnected||turn<0)return;
  const key=hand+'-'+street+'-'+turn+'-'+players[turn].total+'-'+players[turn].acted+'-'+currentBet;
  if(key!==clockKey){clockKey=key;turnDeadline=Date.now()+ACTION_SECONDS*1000;}
 }
-function tickClock(){if(window.netRole==='client'){if(!over&&turnDeadline)$('turnClock').textContent=Math.max(0,Math.ceil((turnDeadline-Date.now())/1000))+'s';return;}if(window.netRole!=='host'||over||!window.remoteConnected||turn<0)return;
+function tickClock(){if(over&&window.remoteConnected&&hand>0){const count=$('resultCountdown');if(count&&!tournamentOver)count.textContent=`Next hand in ${Math.max(0,Math.ceil((handEndDeadline-Date.now())/1000))}s`;}if(window.netRole==='client'){if(!over&&turnDeadline)$('turnClock').textContent=Math.max(0,Math.ceil((turnDeadline-Date.now())/1000))+'s';return;}if(window.netRole!=='host'||over||!window.remoteConnected||turn<0)return;
  ensureClock();if(Date.now()>=turnDeadline){const p=players[turn];if(!canAct(p))return;
  const kind=currentBet===p.bet?'call':'fold';act(kind);}
  else {const remaining=Math.max(0,Math.ceil((turnDeadline-Date.now())/1000));$('turnClock').textContent=remaining+'s';if(window.broadcastState)window.broadcastState();}}
@@ -109,7 +121,13 @@ function render(){ensureClock();
   if(p.id===dealer){const badge=document.createElement('span');badge.className='dealer';badge.textContent='D';name.append(badge);}
   const chips=document.createElement('span');chips.textContent=fmt(p.stack)+' chips';
   const note=document.createElement('small');note.textContent=p.folded?'FOLDED':p.allIn?'ALL-IN':p.bet?`BET ${fmt(p.bet)}`:winners.includes(p.id)?'WINNER':' ';
-  seat.append(name,chips,note);seats.append(seat);
+  seat.append(name,chips,note);
+  if(showdownRevealed&&!p.folded&&p.hole.length===2){
+    const revealed=document.createElement('div');revealed.className='showdown-hole';
+    for(const c of p.hole){const image=card(c);image.classList.add('flip-reveal');revealed.append(image);}
+    seat.append(revealed);
+  }
+  seats.append(seat);
   if(isSelf)for(const c of p.hole)heroCards.append(card(c));
  }
  $('community').replaceChildren();
@@ -145,32 +163,38 @@ function render(){ensureClock();
   const amount=Math.min(max,Math.max(min,Number.isFinite(old)?old:min));
   $('raiseSlider').value=amount;$('raiseInput').value=amount;$('raiseAmount').textContent=fmt(amount);$('raiseLabel').textContent=currentBet?'Raise to':'Bet';
  }
- const showReady=!!window.remoteConnected&&over&&hand>0;
- const overlay=$('readyOverlay');overlay.hidden=!showReady;
- if(showReady){
-  const currentId=localSeat();
-  const mine=!!readySeats[currentId]||window.localReadyPendingHand===hand;
-  const numberReady=readySeats.filter(Boolean).length;
-  $('readyTitle').textContent='Hand complete';
-  $('readyHandNumber').textContent=`HAND #${hand} FINISHED`;
-  $('overlayResult').textContent=lastMessage;
-  $('readyCount').textContent=`${numberReady} / ${players.length} players ready`;
-  $('readyButton').disabled=mine;
-  $('readyButton').textContent=mine?'✓ Ready':'Start next hand';
-  $('readyStatus').textContent=mine?'Waiting for other player to press Start next hand…':'Both players must confirm before the next hand starts.';
+ const resultPanel=$('handResultPanel');
+ resultPanel.hidden=!(window.remoteConnected&&over&&hand>0);
+ if(!resultPanel.hidden){
+   $('resultTitle').textContent=tournamentOver?`${players[championId]?.name||'Player'} wins the tournament!`:'Hand complete';
+   $('resultHeadline').textContent=winningHandLabel;
+   $('resultSubhead').textContent=winningDetails;
+   $('resultCountdown').textContent=tournamentOver?'All chips collected — tournament finished':`Next hand in ${Math.max(0,Math.ceil((handEndDeadline-Date.now())/1000))}s`;
+   $('newGameButton').hidden=!tournamentOver;
+   const list=$('handResults');list.replaceChildren();
+   for(const r of handResults){
+     const line=document.createElement('div');line.className='result-player'+(r.winner?' result-winner':'');
+     const content=document.createElement('div');content.className='result-player-info';
+     const name=document.createElement('strong');name.textContent=r.name+(r.winner?' ★':'');
+     const detail=document.createElement('span');detail.textContent=r.label+(r.won?` · +${fmt(r.won)} chips`:'');
+     content.append(name,detail);line.append(content);
+     if(r.cards.length){const cards=document.createElement('div');cards.className='result-cards';
+       for(const c of r.cards)cards.append(card(c));line.append(cards);}
+     list.append(line);
+   }
  }
  $('next').hidden=true;
- $('status').textContent=!window.remoteConnected?'Waiting for a second device':over?`${readySeats.filter(Boolean).length}/${players.length} players ready`:'Two human players · no bots';
+ $('status').textContent=!window.remoteConnected?'Waiting for a second device':tournamentOver?'Tournament finished':over?'Next hand in 5 seconds':'Two human players · no bots';
  if(window.netRole==='host'&&window.remoteConnected&&window.broadcastState)window.broadcastState();
 }
 function syncRaise(v){const min=Number($('raiseSlider').min),max=Number($('raiseSlider').max);let n=Math.max(min,Math.min(max,Number(v)||min));if(n!==max)n=Math.min(max,min+Math.round((n-min)/bigBlind)*bigBlind);$('raiseSlider').value=n;$('raiseInput').value=n;$('raiseAmount').textContent=fmt(n);}
-$('fold').addEventListener('click',()=>sendAction('fold'));$('check').addEventListener('click',()=>sendAction('call'));$('raise').addEventListener('click',()=>sendAction('raise'));$('raiseSlider').addEventListener('input',e=>syncRaise(e.target.value));$('raiseInput').addEventListener('input',e=>{$('raiseAmount').textContent=fmt(Number(e.target.value)||0);$('raiseSlider').value=e.target.value;});$('minus').addEventListener('click',()=>syncRaise(Number($('raiseInput').value)-bigBlind));$('plus').addEventListener('click',()=>syncRaise(Number($('raiseInput').value)+bigBlind));$('allIn').addEventListener('click',()=>syncRaise($('raiseSlider').max));$('readyButton').addEventListener('click',requestNextHand);$('reset').addEventListener('click',()=>{if(window.netRole!=='host')return;if(confirm('Reset all chip stacks and start over?')){players.forEach(p=>p.stack=5000);hand=0;dealer=1;start();}});
+$('fold').addEventListener('click',()=>sendAction('fold'));$('check').addEventListener('click',()=>sendAction('call'));$('raise').addEventListener('click',()=>sendAction('raise'));$('raiseSlider').addEventListener('input',e=>syncRaise(e.target.value));$('raiseInput').addEventListener('input',e=>{$('raiseAmount').textContent=fmt(Number(e.target.value)||0);$('raiseSlider').value=e.target.value;});$('minus').addEventListener('click',()=>syncRaise(Number($('raiseInput').value)-bigBlind));$('plus').addEventListener('click',()=>syncRaise(Number($('raiseInput').value)+bigBlind));$('allIn').addEventListener('click',()=>syncRaise($('raiseSlider').max));$('newGameButton').addEventListener('click',requestNewGame);$('reset').addEventListener('click',()=>{if(window.netRole!=='host')return;if(confirm('Reset all chip stacks and start over?')){players.forEach(p=>p.stack=5000);hand=0;dealer=1;start();}});
 function sendAction(kind){if(!window.remoteConnected||over||turn!==(window.netRole==='host'?0:1))return;
  if(window.netRole==='host')act(kind);
  else if(window.sendRemoteAction)window.sendRemoteAction(kind,Number($('raiseInput').value));}
-function snapshot(viewer=0){return {players:players.map(p=>({...p,hole:p.id===viewer?p.hole:[],holeCount:p.hole.length})),board,deck:[],dealer,turn,street,currentBet,minRaise,pot,hand,over,lastMessage,winners,smallBlind,bigBlind,turnDeadline,readySeats,winningHandLabel,winningDetails};}
+function snapshot(viewer=0){return {players:players.map(p=>({...p,hole:(p.id===viewer||(showdownRevealed&&!p.folded))?p.hole:[],holeCount:p.hole.length})),board,deck:[],dealer,turn,street,currentBet,minRaise,pot,hand,over,lastMessage,winners,smallBlind,bigBlind,turnDeadline,winningHandLabel,winningDetails,showdownRevealed,handResults,handEndDeadline,tournamentOver,championId};}
 function applySnapshot(s){if(window.netRole!=='client')return;clearTimeout(timer);
  for(let i=0;i<players.length;i++)Object.assign(players[i],s.players[i]);
- board=s.board;dealer=s.dealer;turn=s.turn;street=s.street;currentBet=s.currentBet;minRaise=s.minRaise;pot=s.pot;hand=s.hand;over=s.over;lastMessage=s.lastMessage;winners=s.winners;smallBlind=s.smallBlind;bigBlind=s.bigBlind;turnDeadline=s.turnDeadline;readySeats=s.readySeats||[false,false];winningHandLabel=s.winningHandLabel||'';winningDetails=s.winningDetails||'';render();}
+ board=s.board;dealer=s.dealer;turn=s.turn;street=s.street;currentBet=s.currentBet;minRaise=s.minRaise;pot=s.pot;hand=s.hand;over=s.over;lastMessage=s.lastMessage;winners=s.winners;smallBlind=s.smallBlind;bigBlind=s.bigBlind;turnDeadline=s.turnDeadline;winningHandLabel=s.winningHandLabel||'';winningDetails=s.winningDetails||'';showdownRevealed=!!s.showdownRevealed;handResults=s.handResults||[];handEndDeadline=s.handEndDeadline||0;tournamentOver=!!s.tournamentOver;championId=Number.isInteger(s.championId)?s.championId:-1;render();}
 // The game starts only when the host and one remote player are connected.
 render();
