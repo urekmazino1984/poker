@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>FELT — Multiplayer Hold'em</title>
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
   <div class="app">
     <div class="top-region">
     <header>
       <div class="logo">♠ FELT<span>.</span></div>
-      <div class="meta">ONLINE TABLE <span class="dot">●</span> 2 HUMAN PLAYERS</div>
+      <div class="meta">ONLINE TABLE <span class="dot">●</span> <span id="seatCountLabel">2 HUMAN PLAYERS</span></div>
       <button id="reset" class="ghost">Reset game</button>
     </header>
 
@@ -21,6 +21,13 @@
         <h1>Friday night poker<span>.</span></h1>
         <p>Laptop and phone multiplayer. Private cards stay hidden from other players.</p>
       </div>
+      <div class="history-control">
+        <button type="button" id="historyToggle" class="history-toggle" aria-expanded="false" aria-controls="historyPanel">▤ History <span id="historyCount">0</span> ▾</button>
+        <section id="historyPanel" class="history-panel" hidden aria-label="Last ten completed hands">
+          <strong class="history-title">Last 10 hands</strong>
+          <div id="historyList" class="history-list"><p>No completed hands yet.</p></div>
+        </section>
+      </div>
       <div class="blinds">BLINDS <b id="blindValue">10 / 20</b><small>NO LIMIT · 2 PLAYERS</small></div>
     </div>
 
@@ -29,9 +36,18 @@
     <section id="lobby" class="lobby">
       <div class="lobby-title">Connect your devices</div>
       <div class="lobby-buttons">
-        <button id="hostBtn" class="ghost">Create table (laptop)</button>
+        <button id="hostBtn" class="ghost">Create table</button>
         <input id="roomInput" placeholder="Enter room code" maxlength="12" autocomplete="off" spellcheck="false">
         <button id="joinBtn" class="ghost">Join table (phone)</button>
+      </div>
+      <div id="createOptions" class="create-options" hidden>
+        <div class="option-grid">
+          <label>Host name <input id="hostName" maxlength="15" value="Host" autocomplete="off"></label>
+          <label>Players <select id="playerCount"><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option></select></label>
+          <label>Blinds increase every (hands) <input id="blindHands" type="number" min="1" max="200" step="1" value="20"></label>
+          <label>Starting chips <input id="startingChips" type="number" min="100" max="100000" step="100" value="5000"></label>
+        </div>
+        <button id="confirmHostBtn" type="button" class="create-confirm">Create room</button>
       </div>
       <div id="connectionStatus">Open this page on both devices. Create on laptop, join on phone.</div>
       <div id="roomDisplay"></div>
@@ -114,8 +130,8 @@
   <div class="bottom-buffer" aria-hidden="true"></div>
 
   <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-  <script src="layout.js?v=8"></script>
-  <script src="game.js?v=8"></script>
-  <script src="network.js?v=8"></script>
+  <script src="layout.js?v=9"></script>
+  <script src="game.js?v=9"></script>
+  <script src="network.js?v=9"></script>
 </body>
 </html>
