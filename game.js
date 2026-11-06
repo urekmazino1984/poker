@@ -6,6 +6,8 @@ const STARTING_CHIPS=5000, BASE_SB=10, BASE_BB=20, HANDS_PER_LEVEL=20, ACTION_SE
 let smallBlind=BASE_SB,bigBlind=BASE_BB,turnDeadline=0,clockKey='',clockInterval=null;
 let deck=[],board=[],dealer=1,turn=-1,street='idle',currentBet=0,minRaise=20,pot=0,hand=0,over=true,timer=null,lastMessage='',winners=[];
 let winningHandLabel='',winningDetails='',showdownRevealed=false,handResults=[],handEndDeadline=0,tournamentOver=false,championId=-1;
+// Selection is fresh for every player turn/street; never carry an old raise into the next round.
+let betSelectionKey='';
 function random(n){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n;}
 function shuffle(){const d=[...R].flatMap(rank=>[...S].map(suit=>({rank,suit})));for(let i=d.length-1;i>0;i--){const j=random(i+1);[d[i],d[j]]=[d[j],d[i]];}return d;}
 function cardName(c){return c.rank+c.suit+'.svg';}
@@ -18,7 +20,7 @@ const fmt=n=>n.toLocaleString('en-US');
 function say(s){lastMessage=s;}
 function pay(p,n){let x=Math.min(p.stack,Math.max(0,Math.floor(n)));p.stack-=x;p.bet+=x;p.total+=x;pot+=x;if(!p.stack)p.allIn=true;return x;}
 function start(){if(window.netRole!=='host'||!window.remoteConnected||tournamentOver)return;clearTimeout(timer);if(players.filter(active).length<2)return;
- showdownRevealed=false;handResults=[];handEndDeadline=0;winningHandLabel='';winningDetails='';
+ showdownRevealed=false;handResults=[];handEndDeadline=0;winningHandLabel='';winningDetails='';betSelectionKey='';
  hand++;const level=Math.floor((hand-1)/HANDS_PER_LEVEL);smallBlind=BASE_SB*Math.pow(2,level);bigBlind=BASE_BB*Math.pow(2,level);deck=shuffle();board=[];pot=0;currentBet=0;minRaise=bigBlind;street='preflop';over=false;winners=[];
  players.forEach(p=>{p.hole=[];p.folded=!p.stack;p.allIn=false;p.bet=0;p.total=0;p.acted=false;});
  dealer=next(dealer,active);const seats=players.filter(active);for(let i=0;i<2;i++)for(const p of seats)p.hole.push(deck.pop());
@@ -33,7 +35,7 @@ function advanceStreet(){if(over)return;
  else if(street==='flop'){deck.pop();board.push(deck.pop());street='turn';}
  else if(street==='turn'){deck.pop();board.push(deck.pop());street='river';}
  else{showdown();return;}
- players.forEach(p=>{p.bet=0;p.acted=false;});currentBet=0;minRaise=bigBlind;
+ players.forEach(p=>{p.bet=0;p.acted=false;});currentBet=0;minRaise=bigBlind;betSelectionKey='';
  turn=next(dealer,canAct);clockKey='';say(`${street.toUpperCase()} · ${players[turn]?.name||'All players are all-in'}.`);
  // If everyone is all-in, reveal remaining streets automatically.
  if(players.filter(canAct).length===0){render();timer=setTimeout(advanceStreet,650);return;}
@@ -85,7 +87,7 @@ function startNewGame(){
  if(window.netRole!=='host'||!window.remoteConnected||!tournamentOver)return;
  clearTimeout(timer);
  players.forEach(p=>{p.stack=STARTING_CHIPS;p.hole=[];p.folded=false;p.allIn=false;p.bet=0;p.total=0;p.acted=false;});
- hand=0;dealer=1;tournamentOver=false;championId=-1;showdownRevealed=false;handResults=[];handEndDeadline=0;
+ hand=0;dealer=1;tournamentOver=false;championId=-1;showdownRevealed=false;handResults=[];handEndDeadline=0;betSelectionKey='';
  start();
 }
 function requestNewGame(){
@@ -159,8 +161,19 @@ function render(){ensureClock();
   $('raise').textContent=max<=currentBet?'No raise':'Raise';
   $('raiseSlider').min=min;$('raiseSlider').max=max;$('raiseSlider').step=bigBlind;
   $('raiseInput').min=min;$('raiseInput').max=max;$('raiseInput').step=bigBlind;
-  const old=Number($('raiseInput').value);
-  const amount=Math.min(max,Math.max(min,Number.isFinite(old)?old:min));
+  // A half-pot bet/raise is the starting suggestion on every new decision.
+  // "Raise to" amounts include the current bet; clamp to the minimum legal raise.
+  const decisionKey=`${hand}:${street}:${turn}:${currentBet}:${p.bet}`;
+  let amount;
+  if(decisionKey!==betSelectionKey){
+    const halfPotIncrement=Math.round((pot/2)/bigBlind)*bigBlind;
+    const preferred=currentBet+halfPotIncrement;
+    amount=Math.max(min,Math.min(max,preferred));
+    betSelectionKey=decisionKey;
+  }else{
+    const previous=Number($('raiseInput').value);
+    amount=Math.max(min,Math.min(max,Number.isFinite(previous)?previous:min));
+  }
   $('raiseSlider').value=amount;$('raiseInput').value=amount;$('raiseAmount').textContent=fmt(amount);$('raiseLabel').textContent=currentBet?'Raise to':'Bet';
  }
  const resultPanel=$('handResultPanel');

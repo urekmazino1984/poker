@@ -393,3 +393,112 @@ html.mobile-layout .table-rim{gap:3px}
  .result-panel-rank{font-size:18px}
  .result-cards .card{width:29px;height:41px}
 }
+
+/* V7 mobile layout: seat labels no longer cover community cards or private cards. */
+html.mobile-layout .mobile-game-title{display:none!important}
+html.mobile-layout .heading{min-height:22px}
+html.mobile-layout .app{
+  gap:4px;
+  padding-top:8px;
+  padding-bottom:calc(5dvh + env(safe-area-inset-bottom) + 7px);
+}
+html.mobile-layout .table-area{
+  flex:1 1 auto;
+  justify-content:flex-start;
+  gap:0;
+  min-height:0;
+}
+html.mobile-layout .table-shell{
+  flex:0 0 auto;
+  height:clamp(155px,25dvh,205px);
+  padding-top:14px;
+}
+html.mobile-layout .table{
+  height:calc(100% - 14px);
+  width:min(100%,400px);
+}
+html.mobile-layout .table-rim{
+  gap:2px;
+  padding:13px 7px 15px;
+  justify-content:center;
+}
+html.mobile-layout .pot-title{font-size:9px;line-height:1}
+html.mobile-layout .pot{font-size:20px;line-height:1}
+html.mobile-layout .community{gap:2px;min-height:0}
+html.mobile-layout .community .card{
+  width:clamp(43px,13.25vw,55px);
+  height:auto;
+  aspect-ratio:.7;
+  max-height:78px;
+  flex:0 1 auto;
+}
+html.mobile-layout .community .card.placeholder{
+  height:clamp(59px,18.9vw,77px);
+}
+html.mobile-layout .street{font-size:9px;line-height:1}
+html.mobile-layout .seats-layer .seat{
+  min-width:76px;
+  min-height:34px;
+  max-width:30%;
+  padding:4px 9px;
+  gap:0;
+  background:rgba(4,25,17,.92);
+}
+/* Top opponent occupies space above the top rim; bottom player hugs bottom rim. */
+html.mobile-layout .seats-layer .seat.pos2{
+  top:-21px;
+  left:50%;
+  transform:translateX(-50%);
+}
+html.mobile-layout .seats-layer .seat.pos0{
+  top:auto;
+  bottom:-3px;
+  left:50%;
+  transform:translateX(-50%);
+}
+/* Four-player-ready side positions, kept away from the center board. */
+html.mobile-layout .seats-layer .seat.pos1{left:12%;top:56%}
+html.mobile-layout .seats-layer .seat.pos3{left:88%;top:56%}
+html.mobile-layout .hero-zone{
+  flex:0 1 auto;
+  min-height:0;
+  padding:9px 0 0;
+}
+html.mobile-layout .hero-cards .card{
+  width:clamp(80px,23.3vw,101px);
+  height:auto;
+  aspect-ratio:.7;
+  max-height:clamp(92px,15.2dvh,128px);
+}
+html.mobile-layout .controls{
+  flex:0 0 auto;
+  margin-top:auto;
+  padding:7px 9px 8px;
+  z-index:6;
+}
+html.mobile-layout .message-row{display:none}
+html.mobile-layout .actionbar{margin-top:5px;gap:6px}
+html.mobile-layout .primary-actions button{
+  min-height:44px;
+  font-size:16px;
+}
+html.mobile-layout .raise-box{padding:6px 9px}
+html.mobile-layout .raise-head strong{font-size:18px}
+html.mobile-layout .raise-adjust{margin-top:4px}
+html.mobile-layout input[type=range]{display:block;height:19px;margin:5px 0 0}
+html.mobile-layout .turn-copy h2{font-size:13px}
+html.mobile-layout .timer-display strong{font-size:17px}
+html.mobile-layout .hand-count{font-size:10px}
+/* The buffer participates in layout through .app bottom padding; keep a matching background. */
+html.mobile-layout .bottom-buffer{height:5dvh}
+@media(max-width:699px) and (max-height:700px){
+  html.mobile-layout .table-shell{height:clamp(124px,23dvh,166px);padding-top:10px}
+  html.mobile-layout .table{height:calc(100% - 10px)}
+  html.mobile-layout .hero-zone{padding-top:5px}
+  html.mobile-layout .hero-cards .card{max-height:clamp(76px,13dvh,104px)}
+  html.mobile-layout .controls{padding:5px 7px}
+  html.mobile-layout .primary-actions button{min-height:40px}
+  html.mobile-layout .raise-box{padding:4px 7px}
+  html.mobile-layout .raise-adjust .mini{min-height:30px}
+  html.mobile-layout input[type=number]{padding:4px}
+}
