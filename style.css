@@ -502,3 +502,170 @@ html.mobile-layout .bottom-buffer{height:5dvh}
   html.mobile-layout .raise-adjust .mini{min-height:30px}
   html.mobile-layout input[type=number]{padding:4px}
 }
+
+/* V8 — approved mobile reference: exactly 16/35/20/26/3 dvh.
+   Grid applies after two players connect; lobby retains its normal setup layout. */
+.top-region{display:contents}
+html.mobile-layout.game-connected,
+html.mobile-layout.game-connected body{height:100dvh;width:100%;overflow:hidden}
+html.mobile-layout.game-connected .app{
+  height:97dvh;
+  max-height:97dvh;
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  grid-template-rows:16dvh 35dvh 20dvh 26dvh;
+  row-gap:0;
+  padding:0 10px;
+  margin:0;
+  overflow:hidden;
+}
+html.mobile-layout.game-connected .top-region{
+  grid-row:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  padding:8px 0 1px;
+  justify-content:flex-start;
+}
+html.mobile-layout.game-connected header{
+  flex:0 0 auto;
+  padding:0 0 9px;
+  height:auto;
+  min-height:37px;
+  gap:7px;
+}
+html.mobile-layout.game-connected .heading{
+  flex:1 1 auto;
+  align-items:center;
+  justify-content:flex-end;
+  margin:0;
+  min-height:0;
+}
+html.mobile-layout.game-connected .heading>div:first-child{display:none}
+html.mobile-layout.game-connected .blinds{display:flex;align-self:flex-end;gap:1px}
+html.mobile-layout.game-connected .blinds b{font-size:18px}
+html.mobile-layout.game-connected #lobby{display:none!important}
+html.mobile-layout.game-connected .table-area{display:contents}
+html.mobile-layout.game-connected .table-shell{
+  grid-row:2;
+  width:100%;height:35dvh;
+  min-height:0;max-height:none;
+  display:flex;align-items:center;justify-content:center;
+  padding:0;
+  margin:0;
+  overflow:visible;
+}
+html.mobile-layout.game-connected .table{
+  width:min(100%,440px);
+  height:calc(100% - 34px);
+  min-height:0;max-height:none;
+  margin:0;
+  border-radius:49% / 48%;
+  border-width:6px;
+  position:relative;
+}
+html.mobile-layout.game-connected .table-rim{
+  inset:6px;
+  padding:24px 6px;
+  gap:3px;
+  justify-content:center;
+  overflow:visible;
+}
+html.mobile-layout.game-connected .pot-title{font-size:10px}
+html.mobile-layout.game-connected .pot{font-size:clamp(18px,2.65dvh,24px)}
+html.mobile-layout.game-connected .community{gap:3px;min-height:0;max-width:100%}
+html.mobile-layout.game-connected .community .card{
+  width:min(13.6vw,54px);
+  max-height:min(10.4dvh,79px);
+  height:auto;
+  aspect-ratio:.7;
+  object-fit:contain;
+  flex:0 1 auto;
+}
+html.mobile-layout.game-connected .community .card.placeholder{
+  height:min(10.4dvh,79px);
+}
+html.mobile-layout.game-connected .street{font-size:10px}
+html.mobile-layout.game-connected .seats-layer{position:absolute;inset:0;z-index:5}
+html.mobile-layout.game-connected .seats-layer .seat{
+  min-width:79px;max-width:29%;min-height:38px;
+  padding:5px 9px;
+  background:rgba(5,29,18,.96);
+}
+html.mobile-layout.game-connected .seats-layer .seat.pos2{
+  top:-18px;bottom:auto;left:50%;transform:translateX(-50%);
+}
+html.mobile-layout.game-connected .seats-layer .seat.pos0{
+  bottom:-13px;top:auto;left:50%;transform:translateX(-50%);
+}
+html.mobile-layout.game-connected .seats-layer .seat.pos1{left:11%;top:52%}
+html.mobile-layout.game-connected .seats-layer .seat.pos3{left:89%;top:52%}
+html.mobile-layout.game-connected .hero-zone{
+  grid-row:3;
+  min-height:0;height:20dvh;
+  display:flex;align-items:flex-start;justify-content:center;
+  margin:0;padding:5px 0 0;
+  overflow:hidden;
+}
+html.mobile-layout.game-connected .hero-cards{
+  height:100%;min-height:0;align-items:flex-start;justify-content:center;
+  padding:0;gap:5px;
+}
+html.mobile-layout.game-connected .hero-cards .card{
+  width:min(24vw,102px);
+  height:min(18dvh,148px);
+  max-height:none;
+  aspect-ratio:.7;
+  object-fit:contain;
+}
+html.mobile-layout.game-connected .controls{
+  grid-row:4;
+  height:26dvh;
+  min-height:0;max-height:none;
+  width:100%;
+  display:flex;flex-direction:column;justify-content:center;
+  margin:0;padding:clamp(5px,.9dvh,9px) 8px;
+  border-radius:12px;
+  overflow:hidden;
+}
+html.mobile-layout.game-connected .control-top{flex:0 0 auto;min-height:0;gap:5px}
+html.mobile-layout.game-connected .turn-copy h2{font-size:clamp(12px,1.8dvh,16px);margin:0}
+html.mobile-layout.game-connected .timer-display{font-size:9px;line-height:1}
+html.mobile-layout.game-connected .timer-display strong{font-size:clamp(14px,2.3dvh,21px)}
+html.mobile-layout.game-connected .hand-count{font-size:10px}
+html.mobile-layout.game-connected .message-row{display:none}
+html.mobile-layout.game-connected .actionbar{flex:0 0 auto;gap:clamp(3px,.65dvh,7px);margin-top:clamp(4px,.7dvh,7px)}
+html.mobile-layout.game-connected .primary-actions{gap:6px}
+html.mobile-layout.game-connected .primary-actions button{
+  min-height:0;height:clamp(37px,5.3dvh,52px);
+  font-size:clamp(14px,1.9dvh,18px);border-radius:10px;
+}
+html.mobile-layout.game-connected .raise-box{padding:clamp(4px,.65dvh,7px) 8px}
+html.mobile-layout.game-connected .raise-head{font-size:10px;line-height:1.1}
+html.mobile-layout.game-connected .raise-head strong{font-size:clamp(15px,2.2dvh,20px)}
+html.mobile-layout.game-connected .raise-adjust{
+  display:grid;grid-template-columns:37px minmax(0,1fr) 37px 57px;
+  gap:5px;margin-top:clamp(3px,.45dvh,5px);
+}
+html.mobile-layout.game-connected .raise-adjust .mini{height:clamp(30px,4.1dvh,38px);min-height:0}
+html.mobile-layout.game-connected .raise-adjust input[type=number]{height:clamp(30px,4.1dvh,38px);padding:4px 6px}
+html.mobile-layout.game-connected input[type=range]{display:block;width:100%;height:clamp(17px,2.3dvh,23px);margin:clamp(3px,.55dvh,5px) 0 0}
+html.mobile-layout.game-connected .footer{display:none}
+html.mobile-layout.game-connected .bottom-buffer,
+html.mobile-layout .bottom-buffer{
+  height:3dvh;
+  position:fixed;
+  left:0;right:0;bottom:0;
+  background:#071010;
+  pointer-events:none;
+  z-index:5;
+}
+/* Keep results above the buffer if a hand finishes. */
+html.mobile-layout .hand-result-panel{bottom:calc(3dvh + env(safe-area-inset-bottom) + 5px)}
+@media(max-width:699px) and (max-height:680px){
+ html.mobile-layout.game-connected .table-rim{padding:17px 5px}
+ html.mobile-layout.game-connected .hero-cards .card{height:17dvh}
+ html.mobile-layout.game-connected .controls{padding:4px 7px}
+ html.mobile-layout.game-connected .raise-box{padding:4px 7px}
+}

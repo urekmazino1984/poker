@@ -1,15 +1,14 @@
-FELT Poker — V7 (mobile layout and betting fixes)
+FELT Poker — V8 Responsive Layout
 
-Based on V6. Contains the complete GitHub Pages project.
+Latest visual layout for phones narrower than 700 CSS px, AFTER the multiplayer room is connected:
+- Header / blinds 16dvh
+- Oval poker table and seat labels 35dvh
+- Private cards 20dvh
+- Actions including slider 26dvh
+- Bottom buffer, matching the background 3dvh
 
-Changes:
-- Move opponent and local seat information away from the pot/community cards and the player's private cards.
-- Remove the extra TEXAS HOLD'EM labels while retaining the FELT header.
-- Rebalance the mobile table/cards/actions vertically; maintain a 5dvh bottom safe buffer.
-- Keep the betting slider visible in the action controls on mobile.
-- Reset the suggested raise/bet at every new turn and betting round to approximately half the current pot, rounded to a big-blind increment and clamped to a legal minimum/maximum. User-changed amounts remain untouched during the same decision.
-- Preserve PeerJS multiplayer, private cards, showdown, 5-second restart, tournament finish/new-game action and SVG card artwork.
+All five bands fit exactly 100dvh; the final band is held outside the main grid.
+Existing online PeerJS / poker logic / new hand delay and tournament end are unchanged.
+The lobby continues using the normal connection layout until both devices connect.
 
-Upload the FILES INSIDE this folder to the root of your existing GitHub 'poker' repository. Keep the cards folder. index.html uses ?v=7 for CSS and JavaScript cache-busting.
-
-NOTE: Code syntax was checked; this environment did not permit launching the browser UI for visual regression testing on an actual phone. Please test on a connected phone at your usual viewport and report clipping if any.
+Upload the CONTENTS of this folder (not the enclosing folder) into the repository root.
